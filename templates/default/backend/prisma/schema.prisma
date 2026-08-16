@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  // "admin" | "member" — enforced as a TypeScript union type in src/types.ts,
+  // stored as String for SQLite + PostgreSQL compatibility.
+  role         String   @default("member")
+  // Sensitive field, never stored in plaintext — see src/crypto.ts.
+  // Stores a JSON envelope: { iv, tag, ciphertext } as a string.
+  ssnEncrypted String?
+  createdAt    DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?  // who performed the action (nullable for unauthenticated attempts)
+  action    String   // e.g. "user.login", "user.view_sensitive_field"
+  metadata  String?  // JSON string with extra context (never store secrets here)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}

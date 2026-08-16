@@ -1,0 +1,49 @@
+# docker-compose.yml — runs the backend against a local Postgres instance.
+# Makes the Postgres path as simple to try as the SQLite default path.
+#
+# Usage:
+#   1. Copy backend/.env.example → backend/.env and set your secrets.
+#   2. docker compose up --build
+#   3. In a separate terminal: docker compose exec backend npx prisma migrate deploy
+#
+# The frontend still runs via `npm run dev` — it's a Vite dev server and
+# doesn't need to be containerised for local development.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: secure_stack
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/secure_stack
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in your .env or shell}
+      FIELD_ENCRYPTION_KEY: ${FIELD_ENCRYPTION_KEY:?FIELD_ENCRYPTION_KEY must be set}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      PORT: 4000
+      NODE_ENV: production
+    ports:
+      - "4000:4000"
+
+volumes:
+  pgdata:

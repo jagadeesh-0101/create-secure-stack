@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            templates/default/backend/package-lock.json
+            templates/default/frontend/package-lock.json
+
+      - name: Backend — install & generate Prisma client
+        working-directory: templates/default/backend
+        env:
+          DATABASE_URL: file:./ci.db
+        run: |
+          npm ci
+          npx prisma generate
+
+      - name: Backend — typecheck
+        working-directory: templates/default/backend
+        run: npx tsc --noEmit
+
+      - name: Frontend — install
+        working-directory: templates/default/frontend
+        run: npm ci
+
+      - name: Frontend — typecheck
+        working-directory: templates/default/frontend
+        run: npx tsc --noEmit
+
+  test:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: templates/default/backend/package-lock.json
+
+      - name: Install deps & generate Prisma client
+        working-directory: templates/default/backend
+        env:
+          DATABASE_URL: file:./test.db
+        run: |
+          npm ci
+          npx prisma generate
+
+      - name: Run tests
+        working-directory: templates/default/backend
+        run: npm test
