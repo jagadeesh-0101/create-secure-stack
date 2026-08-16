@@ -1,6 +1,8 @@
 # create-secure-stack
 
-**`create-t3-app`, but security-hardened by default.**
+A zero-config, production-hardened full-stack boilerplate for developers who want to start building features instead of wrestling with auth and infrastructure.
+
+![Secure Stack UI](.github/assets/login_ui.png)
 
 One command scaffolds a full-stack TypeScript app — React + Express + Prisma — with authentication, role-based access control, field-level encryption, and audit logging already wired in and working. Not a checklist. Not a "TODO: add security later." Running code, on day one.
 
