@@ -29,48 +29,66 @@ export function Dashboard() {
   }
 
   return (
-    <div className="card">
-      <div className="row">
-        <h1>Dashboard</h1>
-        <button onClick={logout}>Log out</button>
-      </div>
-      <p>
-        Signed in as <strong>{user!.email}</strong> ({user!.role})
-      </p>
+    <div className="dashboard-container">
+      <nav className="nav-bar">
+        <div className="nav-brand">
+          <h2>SecureStack</h2>
+        </div>
+        <div className="nav-actions">
+          <span className="nav-user">{user!.email}</span>
+          <button className="btn-secondary" onClick={logout}>Sign out</button>
+        </div>
+      </nav>
 
       {user!.role === "admin" && (
-        <section>
-          <h2>All users (admin only)</h2>
+        <section className="card dashboard-card">
+          <h3>User Management</h3>
           <p className="hint">
             Clicking &ldquo;Reveal SSN&rdquo; calls an admin-only route that decrypts the field on
-            the server and writes an audit log entry — it never sends the plaintext value anywhere
-            else.
+            the server and writes an audit log entry — it never sends the plaintext value anywhere else.
           </p>
-          {error && <p className="error">{error}</p>}
+          
+          {error && <div className="error">{error}</div>}
+          
           <table>
             <thead>
               <tr>
                 <th>Email</th>
                 <th>Role</th>
-                <th>SSN</th>
+                <th>SSN (Encrypted)</th>
               </tr>
             </thead>
             <tbody>
               {users.map((u) => (
                 <tr key={u.id}>
                   <td>{u.email}</td>
-                  <td>{u.role}</td>
+                  <td>
+                    <span className={`role-badge role-${u.role}`}>
+                      {u.role}
+                    </span>
+                  </td>
                   <td>
                     {ssnByUserId[u.id] ? (
-                      ssnByUserId[u.id]
+                      <span style={{ fontFamily: "monospace", letterSpacing: "1px" }}>
+                        {ssnByUserId[u.id]}
+                      </span>
                     ) : (
-                      <button onClick={() => revealSsn(u.id)}>Reveal SSN</button>
+                      <button className="btn-secondary" onClick={() => revealSsn(u.id)}>Reveal SSN</button>
                     )}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </section>
+      )}
+      
+      {user!.role !== "admin" && (
+        <section className="card dashboard-card">
+          <h3>Member Portal</h3>
+          <p className="hint" style={{ marginTop: 0 }}>
+            You are signed in as a standard member. Admin features (like user management and SSN decryption) are hidden.
+          </p>
         </section>
       )}
     </div>

@@ -26,12 +26,21 @@ export function Login() {
   }
 
   return (
-    <div className="card">
-      <h1>Log in</h1>
+    <div className="card-wrapper">
+      <div className="card">
+      <h1>Welcome back</h1>
+      <p className="subtitle">Sign in to your account to continue</p>
+      
       <form onSubmit={handleSubmit}>
         <label>
-          Email
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          Email address
+          <input 
+            type="email" 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            placeholder="you@example.com"
+            required 
+          />
         </label>
         <label>
           Password
@@ -39,17 +48,22 @@ export function Login() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
             required
           />
         </label>
-        {error && <p className="error">{error}</p>}
+        
+        {error && <div className="error">{error}</div>}
+        
         <button type="submit" disabled={submitting}>
-          {submitting ? "Logging in..." : "Log in"}
+          {submitting ? "Signing in..." : "Sign in"}
         </button>
       </form>
-      <p>
-        No account? <Link to="/register">Register</Link>
-      </p>
+      
+      <div className="footer-text">
+        Don't have an account? <Link to="/register">Create one now</Link>
+      </div>
+      </div>
     </div>
   );
 }

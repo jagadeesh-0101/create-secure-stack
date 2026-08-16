@@ -27,40 +27,56 @@ export function Register() {
   }
 
   return (
-    <div className="card">
+    <div className="card-wrapper">
+      <div className="card">
       <h1>Create an account</h1>
+      <p className="subtitle">Join us to start building securely</p>
+      
       <form onSubmit={handleSubmit}>
         <label>
-          Email
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          Email address
+          <input 
+            type="email" 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            placeholder="you@example.com"
+            required 
+          />
         </label>
         <label>
-          Password (min 8 characters)
+          Password
+          <div className="hint" style={{marginTop: '-6px', marginBottom: '2px'}}>Minimum 8 characters</div>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
             minLength={8}
             required
           />
         </label>
         <label>
-          SSN (optional — demonstrates field-level encryption)
+          SSN (Optional)
+          <div className="hint" style={{marginTop: '-6px', marginBottom: '2px'}}>Demonstrates field-level AES-256-GCM encryption</div>
           <input
             type="text"
             value={ssn}
             onChange={(e) => setSsn(e.target.value)}
-            placeholder="123-45-6789"
+            placeholder="000-00-0000"
           />
         </label>
-        {error && <p className="error">{error}</p>}
+        
+        {error && <div className="error">{error}</div>}
+        
         <button type="submit" disabled={submitting}>
           {submitting ? "Creating account..." : "Register"}
         </button>
       </form>
-      <p>
-        Already have an account? <Link to="/login">Log in</Link>
-      </p>
+      
+      <div className="footer-text">
+        Already have an account? <Link to="/login">Sign in instead</Link>
+      </div>
+      </div>
     </div>
   );
 }
